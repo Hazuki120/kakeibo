@@ -20,7 +20,7 @@ public class UserDAO {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		return null;	// ログイン失敗
+		return null;	// ログイン失敗(失敗）
 	}
 	public String registerWithMessage(String username, String password) {
 		String sql = "INSERT INTO users(username, password) VALUES(?, ?)";

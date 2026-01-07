@@ -7,6 +7,11 @@ import javafx.collections.ObservableList;
 
 public class TransactionDAO {
 	
+	/**
+	 * 指定したユーザーIDの家計簿データをすべて読み込むメソッド
+	 * @param userId ログイン中のユーザーID
+	 * @return MukkunTransaction のリスト(ObservableList)
+	 */
 	public ObservableList<MukkunTransaction>load(int userId){
 		ObservableList<MukkunTransaction>list = FXCollections.observableArrayList();
 		String sql = "SELECT * FROM transactions WHERE user_id=?";

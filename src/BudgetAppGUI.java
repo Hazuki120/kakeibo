@@ -203,7 +203,7 @@ public class BudgetAppGUI extends Application {
 				new Alert(Alert.AlertType.INFORMATION, "登録が完了しました！\nログインしてください。").showAndWait();
 
 			} else {
-				new Alert(Alert.AlertType.ERROR, "登録に失敗しました。（既に登録されている可能性があります。").showAndWait();
+				new Alert(Alert.AlertType.ERROR, "登録に失敗しました（既に登録されている可能性があります。").showAndWait();
 			}
 		});
 

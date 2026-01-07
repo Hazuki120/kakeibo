@@ -18,7 +18,7 @@ public class MukkunTransaction {
 		this(-1, date, category, memo, amount);
 	}
 	
-	// 表示用メソッド（むっくん風）
+	// 表示用メソッド（むっくん風🐻）
 	public void print() {
 		System.out.println("はにゃ～|" + date + "|" + category + "|"  + memo + "|" + amount +"円");
 	}

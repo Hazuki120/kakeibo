@@ -41,7 +41,7 @@ public class MukkunKakeibo {
 				//トランザクションを作成してリストに追加
 				MukkunTransaction t = new MukkunTransaction(date, category, memo, amount);
 				transactions.add(t);
-				System.out.println("きろくできた！");
+				System.out.println("きろくできたよ");
 			} 
 			// 2.収支履歴を表示
 			else if (choice == 2) {
