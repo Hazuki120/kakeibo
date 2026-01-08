@@ -116,12 +116,16 @@ public class BudgetAppGUI extends Application {
 				int amount = Integer.parseInt(amountField.getText());
 
 				MukkunTransaction newTransaction = new MukkunTransaction(date, category, memo, amount);
+				
+				// ①DBに保存
+				dao.add(loggedInUserId, newTransaction);
+				// ②TableView に追加
 				data.add(newTransaction);
 
-				// 合計を更新
+				// ③合計を更新
 				updateTotal();
 
-				// 入力欄をクリア
+				// ④入力欄をクリア
 				dateField.clear();
 				categoryField.clear();
 				memoField.clear();
@@ -148,6 +152,7 @@ public class BudgetAppGUI extends Application {
 
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
+				dao.delete(selected.getId());
 				data.remove(selected);
 				updateTotal();
 			}
@@ -162,7 +167,6 @@ public class BudgetAppGUI extends Application {
 		// 画面レイアウト
 		VBox root = new VBox(10, table, inputBox, buttonBox, totalLabel);
 		// シーン
-		Scene scene = new Scene(root, 700, 450);
 		return new Scene(root, 700, 450);
 	}
 
@@ -203,7 +207,7 @@ public class BudgetAppGUI extends Application {
 				new Alert(Alert.AlertType.INFORMATION, "登録が完了しました！\nログインしてください。").showAndWait();
 
 			} else {
-				new Alert(Alert.AlertType.ERROR, "登録に失敗しました（既に登録されている可能性があります。").showAndWait();
+				new Alert(Alert.AlertType.ERROR, "登録に失敗しました。\n理由: " + result).showAndWait();
 			}
 		});
 
