@@ -1,32 +1,18 @@
-version : '3.8'
+version: '3.8'
 
 services:
-app:
-build: ./app
-container_name: kakeibo-app
-ports:
-- "8088:8080"
-depends_on:
-- db
-enviroment:
- DB_HOST: db
- DB_POST: 3306
- DB_NAME: kakeibo
- DB_USER: ${DB_USER}
- DB_PASSWORD: ${DB_PASS}
-
-db:
+  mysql:
     image: mysql:8.0
     container_name: kakeibo-mysql
-    ports:
-    - "3306:3306"
     environment:
-        MYSQL_ROOT_PASSWORD: MySQL@2025
-        MYSQL_DATABASE: kakeibo
-        MYSOL_USER: ${MYSQL_USER}
-        MYSQL_PASSWORD: ${MYSQL_PASS}
-        TZ: Asia/Tokyo
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: kakeibo
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    ports:
+      - "3307:3306"
     volumes:
-    - mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
+
 volumes:
-    mysql_data:
+  mysql_data:

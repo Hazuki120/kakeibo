@@ -1,3 +1,10 @@
-bin/
-*.class
-DB.java
+/bin/
+/.settings/
+/.classpath
+.project
+/lib/*.jar
+*.log
+/Dockerfile
+
+# JavaFX SDK
+/javafx-sdk-21.0.9/
