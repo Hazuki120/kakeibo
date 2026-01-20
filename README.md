@@ -14,6 +14,9 @@ Markdown
 - JDBC (MySQL Connector/J)
 - Eclipse / Pleiades
 
+※ MySQL Connector/J は学習目的のため lib 配下に配置しています。
+実務では Maven / Gradle による依存関係管理を想定しています。
+
 ---
 
 ## 1. リポジトリをクローン
