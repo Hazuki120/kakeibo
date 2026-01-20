@@ -1,5 +1,6 @@
 package app.view;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import app.dao.TransactionDAO;
@@ -11,12 +12,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -81,15 +87,19 @@ public class BudgetAppGUI extends Application {
 		// 列の定義
 		TableColumn<MukkunTransaction, String> dateColumn = new TableColumn<>("日付");
 		dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+		dateColumn.setPrefWidth(120);
 		TableColumn<MukkunTransaction, String> categoryColumn = new TableColumn<>("カテゴリ");
 		categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-		TableColumn<MukkunTransaction, String> memoColumn = new TableColumn<>("メモ");
-		memoColumn.setCellValueFactory(new PropertyValueFactory<>("memo"));
+		categoryColumn.setPrefWidth(100);
 		TableColumn<MukkunTransaction, Integer> amountColumn = new TableColumn<>("金額");
 		amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-
+		amountColumn.setPrefWidth(80);
+		TableColumn<MukkunTransaction, String> memoColumn = new TableColumn<>("メモ");
+		memoColumn.setCellValueFactory(new PropertyValueFactory<>("memo"));
+		memoColumn.setPrefWidth(250);
+		
 		// 列を TableView に追加
-		table.getColumns().addAll(dateColumn, categoryColumn, memoColumn, amountColumn);
+		table.getColumns().addAll(dateColumn, categoryColumn, amountColumn, memoColumn);
 
 		// データをTableにセット
 		table.setItems(data);
@@ -99,14 +109,29 @@ public class BudgetAppGUI extends Application {
 		updateTotal(); // 初期合計を表示
 
 		// 入力フォーム
-		TextField dateField = new TextField();
-		dateField.setPromptText("日付（例： 2025-06-09）");
-		TextField categoryField = new TextField();
-		categoryField.setPromptText("カテゴリ");
-		TextField memoField = new TextField();
-		memoField.setPromptText("メモ");
+		// 日付をカレンダーで選択する
+		DatePicker datePicker = new DatePicker();
+		datePicker.setPromptText("日付選択");
+		// カテゴリを選択式にする
+		ComboBox<String> categoryBox = new ComboBox<>();
+		categoryBox.getItems().addAll(
+				"給料", "食費", "日用品", "娯楽", "交通費", "通信費", "光熱費", "家賃", "保険", "ローン", "投資", "その他");
+		categoryBox.setPromptText("カテゴリ選択");
 		TextField amountField = new TextField();
 		amountField.setPromptText("金額");
+		TextField memoField = new TextField();
+		memoField.setPromptText("メモ");
+		
+		// 収入・支出の選択
+		RadioButton expenseRadio = new RadioButton("支出");
+		RadioButton incomeRadio = new RadioButton("収入");
+		
+		ToggleGroup typeGroup = new ToggleGroup();
+		expenseRadio.setToggleGroup(typeGroup);
+		incomeRadio.setToggleGroup(typeGroup);
+		
+		// 初期値を支出
+		expenseRadio.setSelected(true);
 
 		// ボタン
 		Button addButton = new Button("追加");
@@ -115,12 +140,24 @@ public class BudgetAppGUI extends Application {
 		// 追加ボタンの処理 
 		addButton.setOnAction(e -> {
 			try {
-				String date = dateField.getText();
-				String category = categoryField.getText();
+				LocalDate selectedDate = datePicker.getValue();
+				String category = categoryBox.getValue();
+				
+				if (selectedDate == null || category == null) {
+					new Alert(Alert.AlertType.ERROR, "日付とカテゴリを選択してください。").showAndWait();
+					return;
+				}
+				String date = selectedDate.toString();
+				
 				String memo = memoField.getText();
 				int amount = Integer.parseInt(amountField.getText());
+				
+				// 支出ならマイナス
+				if (expenseRadio.isSelected()) {
+					amount = -amount;
+				}
 
-				MukkunTransaction newTransaction = new MukkunTransaction(date, category, memo, amount);
+				MukkunTransaction newTransaction = new MukkunTransaction(date, category, amount, memo);
 				
 				// ①DBに保存
 				dao.add(loggedInUserId, newTransaction);
@@ -131,8 +168,8 @@ public class BudgetAppGUI extends Application {
 				updateTotal();
 
 				// ④入力欄をクリア
-				dateField.clear();
-				categoryField.clear();
+				datePicker.setValue(null);
+				categoryBox.setValue(null);
 				memoField.clear();
 				amountField.clear();
 			} catch (NumberFormatException ex) {
@@ -164,15 +201,18 @@ public class BudgetAppGUI extends Application {
 		});
 
 		// 入力欄
-		HBox inputBox = new HBox(10, dateField, categoryField, memoField, amountField, addButton);
+		HBox typeBox = new HBox(10, expenseRadio, incomeRadio);
+		HBox inputBox = new HBox(10, datePicker, categoryBox, typeBox, amountField, memoField, addButton);
+		HBox.setHgrow(memoField, Priority.ALWAYS);
+		memoField.setMaxWidth(Double.MAX_VALUE);
 		// ボタン
 		HBox buttonBox = new HBox(10);
 		buttonBox.getChildren().addAll(addButton, deleteButton);
 
 		// 画面レイアウト
 		VBox root = new VBox(10, table, inputBox, buttonBox, totalLabel);
-		// シーン
-		return new Scene(root, 700, 450);
+		// 画面の大きさ
+		return new Scene(root, 800, 500);
 	}
 
 	// 合計を計算してラベルに反映
@@ -193,7 +233,7 @@ public class BudgetAppGUI extends Application {
 		Button backButton = new Button("戻る");
 
 		VBox box = new VBox(10, userLabel, userField, passLabel, passField, registerButton, backButton);
-		Scene scene = new Scene(box, 300, 250);
+		Scene scene = new Scene(box, 300, 200);
 
 		// 登録ボタンの処理
 		registerButton.setOnAction(e -> {

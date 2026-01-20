@@ -28,8 +28,8 @@ public class TransactionDAO {
 						rs.getInt("id"),
 						rs.getString("date"),
 						rs.getString("category"),
-						rs.getString("memo"),
-						rs.getInt("amount")
+						rs.getInt("amount"),
+						rs.getString("memo")
 						));
 			}
 		}catch(Exception e) {
@@ -39,15 +39,15 @@ public class TransactionDAO {
 	}
 	
 	public void add(int userId, MukkunTransaction t) {
-		String sql = "INSERT INTO transactions(user_id, date, category, memo, amount)VALUES(?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO transactions(user_id, date, category, amount, memo)VALUES(?, ?, ?, ?, ?)";
 		
 		try (Connection conn = DB.getConnection();
 				PreparedStatement ps = conn.prepareStatement(sql)){
 			ps.setInt(1, userId);
 			ps.setString(2, t.getDate());
 			ps.setString(3, t.getCategory());
-			ps.setString(4, t.getMemo());
-			ps.setInt(5, t.getAmount());
+			ps.setInt(4, t.getAmount());
+			ps.setString(5, t.getMemo());
 			
 			ps.executeUpdate();
 		}catch(Exception e) {

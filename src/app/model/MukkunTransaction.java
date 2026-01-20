@@ -8,20 +8,20 @@ public class MukkunTransaction {
 	private int amount;	// 金額（収支はプラス、支出はマイナス）
 	
 	// コンストラクタ
-	public MukkunTransaction(int id, String date, String category, String memo, int amount) {
+	public MukkunTransaction(int id, String date, String category, int amount, String memo) {
 		this.id = id;
 		this.date = date;
 		this.category = category;
-		this.memo = memo;
 		this.amount = amount;
+		this.memo = memo;
 	}
-	public MukkunTransaction(String date, String category, String memo, int amount) {
-		this(-1, date, category, memo, amount);
+	public MukkunTransaction(String date, String category, int amount, String memo) {
+		this(-1, date, category, amount, memo);
 	}
 	
 	// 表示用メソッド（むっくん風🐻）
 	public void print() {
-		System.out.println("はにゃ～|" + date + "|" + category + "|"  + memo + "|" + amount +"円");
+		System.out.println("はにゃ～|" + date + "|" + category + "|" + amount +"円|"  + memo + "|" );
 	}
 	
 	// toStoring() メソッド（デバッグやログ出力に便利）
@@ -30,8 +30,8 @@ public class MukkunTransaction {
 		return "MukkunTransaction{" +
 				"date=" + date + '\'' +
 				", category=" + category + '\'' +
-				", memo='" + memo + '\'' +
-				", amount=" + amount + '}';
+				", amount=" + amount + '}' +
+				", memo='" + memo + '\'' ;
 	}
 	
 	// getter メソッドたち（他のクラスから値を取り出すときに使う）

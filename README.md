@@ -14,7 +14,7 @@ Markdown
 - JDBC (MySQL Connector/J)
 - Eclipse / Pleiades
 
-※ MySQL Connector/J は学習目的のため lib 配下に配置しています。
+※ MySQL Connector/J は学習目的のため lib 配下に配置しています。  
 実務では Maven / Gradle による依存関係管理を想定しています。
 
 ---
@@ -43,6 +43,8 @@ MySQL は以下の設定で起動します：
 ## 3. データベース構造
 初回起動後、以下の SQL を実行して users テーブルを作成してください。
 
+users テーブル  
+
 ```sql
 CREATE TABLE users (  
 	id INT AUTO_INCREMENT PRIMARY KEY,  
@@ -50,8 +52,26 @@ CREATE TABLE users (
 	password VARCHAR(100) NOT NULL,  
 	email VARCHAR(100),  
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  
-);
+) ENGINE=InnoDB;
 ```
+transactions テーブル
+
+```sql
+CREATE TABLE transactions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  date DATE NOT NULL,
+  category VARCHAR(50) NOT NULL,
+  amount INT NOT NULL,
+  memo VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_transactions_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+) ENGINE=InnoDB;
+```
+※ transactions テーブルは users テーブルと外部キー制約で関連付けています。  
+※ ユーザごとに家計簿データを管理する想定です。
+
 ## 4. アプリの起動方法
 ### ① JavaFX ライブラリを設定
 JavaFX SDK をダウンロードし、Eclipse で以下を設定してください。
@@ -64,7 +84,7 @@ JavaFX SDK をダウンロードし、Eclipse で以下を設定してくださ�
 ・javafx.fxml.jar  
 ・javafx.graphics.jar  
 
-### ② VM引数を設定
+### ② VM引数を設定（重要：JavaFX の警告対策)
 Eclipse の実行構成に以下を追加します↓
 
 ```text
@@ -72,6 +92,14 @@ Eclipse の実行構成に以下を追加します↓
 ```
 
 ※ javafx-sdk-21 のパスは環境に合わせて変更してください。
+※ `/C:\...` のようにスラッシュとコロンが混ざるとエラーになります。
+
+### よくあるエラーと対処
+
+| エラー内容 | 原因 | 対処 |
+|-----------|------|------|
+| Unsupported JavaFX configuration: classes were loaded from 'unnamed module' | JavaFX が classpath で読み込まれている | module-path を正しく設定する |
+| InvalidPathException: Illegal char <:> | `/C:\...` のように不正なパス形式 | `C:\...` の Windows パスに修正 |
 
 ### ③ アプリを起動
 Main.java を実行すると、アプリが起動します。
