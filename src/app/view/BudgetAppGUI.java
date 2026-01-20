@@ -16,6 +16,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -94,6 +95,25 @@ public class BudgetAppGUI extends Application {
 		TableColumn<MukkunTransaction, Integer> amountColumn = new TableColumn<>("金額");
 		amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 		amountColumn.setPrefWidth(80);
+		// 収支の色付け
+		amountColumn.setCellFactory(col -> new TableCell<>() {
+			@Override
+			protected void updateItem(Integer value, boolean empty) {
+				super.updateItem(value, empty);
+				if (empty || value == null) {
+					setText(null);
+					setStyle("");
+				}else {
+					setText(value + "円");
+					if (value < 0) {
+						setStyle("-fx-text-fill: red;");
+					}else {
+						setStyle("-fx-text-fill: blue;");
+					}
+				}
+			}
+		});
+		
 		TableColumn<MukkunTransaction, String> memoColumn = new TableColumn<>("メモ");
 		memoColumn.setCellValueFactory(new PropertyValueFactory<>("memo"));
 		memoColumn.setPrefWidth(250);
@@ -107,6 +127,11 @@ public class BudgetAppGUI extends Application {
 		// 合計ラベル
 		totalLabel = new Label("合計： 0円");
 		updateTotal(); // 初期合計を表示
+		
+		String currentMonth = LocalDate.now().toString().substring(0, 7);
+		int monthlyTotal = calculateMonthlyTotal(currentMonth);
+		Label monthlyLabel = new Label("今月の合計：" + monthlyTotal + "円");
+
 
 		// 入力フォーム
 		// 日付をカレンダーで選択する
@@ -212,13 +237,20 @@ public class BudgetAppGUI extends Application {
 		// 画面レイアウト
 		VBox root = new VBox(10, table, inputBox, buttonBox, totalLabel);
 		// 画面の大きさ
-		return new Scene(root, 800, 500);
+		return new Scene(root, 750, 500);
 	}
 
 	// 合計を計算してラベルに反映
 	private void updateTotal() {
 		int total = data.stream().mapToInt(MukkunTransaction::getAmount).sum();
 		totalLabel.setText("合計：" + total + "円");
+	}
+	// 月別合計
+	private int calculateMonthlyTotal(String yearMonth) {
+		return data.stream()
+				.filter(t -> t.getDate().startsWith(yearMonth))
+				.mapToInt(MukkunTransaction::getAmount)
+				.sum();
 	}
 
 	// 新規登録画面のメソッド
