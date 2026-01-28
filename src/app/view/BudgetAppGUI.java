@@ -12,9 +12,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -40,13 +42,36 @@ public class BudgetAppGUI extends Application {
 		TextField userField = new TextField();
 
 		Label passLabel = new Label("パスワード");
-		TextField passField = new TextField();
+		PasswordField passField = new PasswordField();	// 非表示
+		TextField passVisibleField = new TextField();	// 表示
+		
+		passVisibleField.setVisible(false);
+		passVisibleField.setManaged(false);
+		
+		CheckBox showPasswordCheckBox = new CheckBox("パスワードを表示");
+		// パスワードの中身を同期
+		passVisibleField.textProperty().bindBidirectional(passField.textProperty());
+		
+		// 表示切替の処理
+		showPasswordCheckBox.selectedProperty().addListener((obs, oldVal, newVal) ->{
+			if(newVal) {
+				passVisibleField.setVisible(true);
+				passVisibleField.setManaged(true);
+				passField.setVisible(false);
+				passField.setManaged(false);
+			}else {
+				passField.setVisible(true);
+				passField.setManaged(true);
+				passVisibleField.setVisible(false);
+				passVisibleField.setManaged(false);
+			}
+		});
 
 		Button loginButton = new Button("ログイン");
 		Button registerButton = new Button("新規登録");
 
-		VBox loginBox = new VBox(10, userLabel, userField, passLabel, passField, loginButton, registerButton);
-		Scene loginScene = new Scene(loginBox, 300, 200);
+		VBox loginBox = new VBox(10, userLabel, userField, passLabel, passField, passVisibleField, showPasswordCheckBox, loginButton, registerButton);
+		Scene loginScene = new Scene(loginBox, 300, 220);
 
 		// ログインボタンの処理
 		loginButton.setOnAction(e -> {
@@ -140,7 +165,7 @@ public class BudgetAppGUI extends Application {
 		// カテゴリを選択式にする
 		ComboBox<String> categoryBox = new ComboBox<>();
 		categoryBox.getItems().addAll(
-				"給料", "食費", "日用品", "娯楽", "交通費", "通信費", "光熱費", "家賃", "保険", "ローン", "投資", "その他");
+				"給料", "食費", "日用品", "娯楽", "交通費", "通信費", "光熱費", "家賃", "保険", "ローン", "投資", "せんちゃ", "その他");
 		categoryBox.setPromptText("カテゴリ選択");
 		TextField amountField = new TextField();
 		amountField.setPromptText("金額");
@@ -252,6 +277,11 @@ public class BudgetAppGUI extends Application {
 				.mapToInt(MukkunTransaction::getAmount)
 				.sum();
 	}
+	//ComboBox<String> monthBox = new ComboBox<>();
+	//monthBox.getItems().addAll(
+	//		"2026-01");
+	//monthBox.setValue(LocalDate.now().toString().substring(0, 7));
+	
 
 	// 新規登録画面のメソッド
 	private Scene createRegisterScene(Stage primaryStage) {
@@ -265,7 +295,7 @@ public class BudgetAppGUI extends Application {
 		Button backButton = new Button("戻る");
 
 		VBox box = new VBox(10, userLabel, userField, passLabel, passField, registerButton, backButton);
-		Scene scene = new Scene(box, 300, 200);
+		Scene scene = new Scene(box, 300, 220);
 
 		// 登録ボタンの処理
 		registerButton.setOnAction(e -> {
