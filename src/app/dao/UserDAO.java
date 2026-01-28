@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import app.util.PasswordUtil;
+
 public class UserDAO {
 	public Integer login(String username, String password) {
 		String sql = "SELECT id FROM users WHERE username=? AND password=?";
@@ -12,7 +14,8 @@ public class UserDAO {
 				PreparedStatement ps = conn.prepareStatement(sql)){
 			
 			ps.setString(1,  username);
-			ps.setString(2,  password);
+			String hashed = PasswordUtil.hash(password);
+			ps.setString(2,  hashed);
 			
 			ResultSet rs = ps.executeQuery();
 			if(rs.next()) {
@@ -29,7 +32,8 @@ public class UserDAO {
 		try(Connection conn = DB.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql)){
 			stmt.setString(1, username);
-			stmt.setString(2, password);
+			String hashed = PasswordUtil.hash(password);
+			stmt.setString(2, hashed);
 			
 			stmt.executeUpdate();
 			return "OK";
