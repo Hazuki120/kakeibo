@@ -26,9 +26,16 @@ cd kakeibo
 ```
 
 ## 2. Docker で MySQL を起動
+### 起動方法
 ```bash
+cd kakeibo
 docker compose up -d
 ```
+### 停止方法
+```bash
+docker compose down
+```
+
 MySQL は以下の設定で起動します：  
 | 項目           | 値         |
 |----------------|------------|
@@ -39,11 +46,13 @@ MySQL は以下の設定で起動します：
 | データベース名 | kakeibo    |
 
 ※ 開発用のパスワードです。
+※ docker compose で作成したコンテナは `docker start kakeibo-mysql` でも再起動可能です。
 
 ## 3. データベース構造
 
 本プロジェクトでは docker-compose.yml により、  
-sql/init/配下の SQL ファイルが MySQL 初回起動時に自動実行されます。  
+sql/init/配下の SQL ファイルは、  
+MySQL のデータ領域（volume）が空の場合のみ自動実行されます。  
 
 通常は手動で SQL を実行する必要はありません。  
 テーブル構造を確認したい場合や、MySQL 単体で利用する場合に  
@@ -56,6 +65,10 @@ sql/init/配下の SQL ファイルが MySQL 初回起動時に自動実行さ�
 docker compose down -v
 docker compose up -d
 ```
+
+※ -v オプションを付けると、MySQL のデータ（volume）が全削除されます。  
+
+
 
 ※ 以下は参考用の SQL 定義です（通常は自動作成されます。）  
 

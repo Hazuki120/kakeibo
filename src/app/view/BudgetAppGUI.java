@@ -153,9 +153,9 @@ public class BudgetAppGUI extends Application {
 		totalLabel = new Label("合計： 0円");
 		updateTotal(); // 初期合計を表示
 		
-		String currentMonth = LocalDate.now().toString().substring(0, 7);
-		int monthlyTotal = calculateMonthlyTotal(currentMonth);
-		Label monthlyLabel = new Label("今月の合計：" + monthlyTotal + "円");
+//		String currentMonth = LocalDate.now().toString().substring(0, 7);
+//		int monthlyTotal = calculateMonthlyTotal(currentMonth);
+//		Label monthlyLabel = new Label("今月の合計：" + monthlyTotal + "円");
 
 
 		// 入力フォーム
