@@ -41,7 +41,23 @@ MySQL は以下の設定で起動します：
 ※ 開発用のパスワードです。
 
 ## 3. データベース構造
-初回起動後、以下の SQL を実行して users テーブルを作成してください。
+
+本プロジェクトでは docker-compose.yml により、  
+sql/init/配下の SQL ファイルが MySQL 初回起動時に自動実行されます。  
+
+通常は手動で SQL を実行する必要はありません。  
+テーブル構造を確認したい場合や、MySQL 単体で利用する場合に  
+以下の SQL を使用できます。  
+
+テーブル(users / transactions) は MySQL 初回起動時に自動作成されます。  
+再作成をしたい場合は、以下を実行してください。
+
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+※ 以下は参考用の SQL 定義です（通常は自動作成されます。）  
 
 users テーブル  
 
@@ -73,7 +89,18 @@ CREATE TABLE transactions (
 ※ ユーザごとに家計簿データを管理する想定です。
 
 ## 4. アプリの起動方法
-### ① JavaFX ライブラリを設定
+### ① MySQL Connector/J をビルドパスに追加
+lib/mysql-connector-j-9.5.0.jar を  
+Eclipse のビルド・パスに追加してください。
+
+設定手順
+【プロジェクトのプロパティ】→【Java ビルドパス】→【ライブラリ】→【外部 JAR の追加】
+
+※ この設定を行わない場合、MySQL に接続できません。  
+※ 本プロジェクトは Maven / Gradle を使用していないため、  
+JDBC ドライバは手動でビルド・パスに追加する必要があります。
+
+### ② JavaFX ライブラリを設定
 JavaFX SDK をダウンロードし、Eclipse で以下を設定してください。
 
 設定手順
@@ -84,14 +111,14 @@ JavaFX SDK をダウンロードし、Eclipse で以下を設定してくださ�
 ・javafx.fxml.jar  
 ・javafx.graphics.jar  
 
-### ② VM引数を設定（重要：JavaFX の警告対策)
+### ③ VM引数を設定（重要：JavaFX の警告対策)
 Eclipse の実行構成に以下を追加します↓
 
 ```text
 --module-path "javafx-sdk-21/lib" --add-modules javafx.controls,javafx.fxml
 ```
 
-※ javafx-sdk-21 のパスは環境に合わせて変更してください。
+※ javafx-sdk-21 のパスは環境に合わせて変更してください。  
 ※ `/C:\...` のようにスラッシュとコロンが混ざるとエラーになります。
 
 ### よくあるエラーと対処
@@ -101,7 +128,7 @@ Eclipse の実行構成に以下を追加します↓
 | Unsupported JavaFX configuration: classes were loaded from 'unnamed module' | JavaFX が classpath で読み込まれている | module-path を正しく設定する |
 | InvalidPathException: Illegal char <:> | `/C:\...` のように不正なパス形式 | `C:\...` の Windows パスに修正 |
 
-### ③ アプリを起動
+### ④ アプリを起動
 Main.java を実行すると、アプリが起動します。
 新規登録・ログイン・家計簿管理機能を利用できます。
 
