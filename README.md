@@ -164,12 +164,12 @@ Main.java → 右クリック → 【実行】 → 【実行の構成】→ 【�
 ```mermaid
 flowchart LR
 
-    User[ユーザー] -->|ログイン情報入力| App[家計簿アプリ<br>(JavaFX + DAO)]
-    App -->|ログイン認証| DB[(MySQL 8.0<br>Docker)]
+    User[ユーザー] -->|ログイン情報入力| App[家計簿アプリ (JavaFX + DAO)]
+    App -->|ログイン認証| DB[(MySQL 8.0 / Docker)]
     DB -->|認証結果| App
 
     User -->|収支入力| App
-    App -->|登録/削除/検索| DB
+    App -->|登録 / 削除 / 検索| DB
     DB -->|収支データ| App
     App -->|画面表示| User
 ```
@@ -199,7 +199,7 @@ erDiagram
     }
 
     USERS ||--o{ TRANSACTIONS : "1:N"
- ```
+```
  
  ### DAO構造図（DAO Architecture Diagram）
 
