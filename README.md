@@ -161,51 +161,24 @@ Main.java → 右クリック → 【実行】 → 【実行の構成】→ 【�
 ### データフロー図（DFD）
 アプリ全体のデータの流れは以下の通りです。  
 
-```mermaid
-flowchart LR
+![dfd](./screenshots/dfd.png)
 
-    User[ユーザー] -->|ログイン情報入力| App[家計簿アプリ (JavaFX + DAO)]
-    App -->|ログイン認証| DB[(MySQL 8.0 / Docker)]
-    DB -->|認証結果| App
+---
 
-    User -->|収支入力| App
-    App -->|登録 / 削除 / 検索| DB
-    DB -->|収支データ| App
-    App -->|画面表示| User
-```
 
 ### ER 図（ERD）
-ユーザと家計簿データ（収支）は 1 対 多 の関係です。
+ユーザと家計簿データの関係を示した ER 図です。  
+![erd](./screenshots/erd.png)
 
-```mermaid
-erDiagram
+---
 
-    USERS {
-        int id PK
-        varchar username
-        varchar password
-        varchar email
-        timestamp created_at
-    }
 
-    TRANSACTIONS {
-        int id PK
-        int user_id FK
-        date date
-        varchar category
-        int amount
-        varchar memo
-        timestamp created_at
-    }
-
-    USERS ||--o{ TRANSACTIONS : "1:N"
-```
  
  ### DAO構造図（DAO Architecture Diagram）
 
 ユーザー情報と家計簿データを扱う DAO クラスの責務を示しています。
 
-![Relationship](./screenshots/Relationship.png)
+![relationship](./screenshots/relationship.png)
 
  
  ## 7. 画面キャプチャ
