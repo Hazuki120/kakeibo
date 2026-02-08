@@ -1,4 +1,3 @@
-Markdown
 
 # 家計簿アプリ(JavaFX + MySQL + Docker)
 
@@ -12,10 +11,11 @@ Markdown
 * JavaFX 21
 * MySQL 8.0(Docker)
 * JDBC (MySQL Connector/J)
+* dotenv-java（環境変数管理）
 * Eclipse / Pleiades
 * Docker
 
-※ MySQL Connector/J は学習目的のため lib 配下に配置しています。  
+※ MySQL Connector/J と dotenv-java は学習目的のため `lib/` 配下に配置しています。  
 実務では Maven / Gradle による依存関係管理を想定しています。
 
 ---
@@ -39,15 +39,37 @@ cd kakeibo
 ## 2. Docker で MySQL を起動
 ### 起動
 ```bash
-cd kakeibo
 docker compose up -d
+```
+### 既存コンテナを再起動
+```bash
+docker start kakeibo-mysql
 ```
 ### 停止
 ```bash
 docker compose down
 ```
 
+環境変数管理（dotenv-java）
+このアプリでは、データベース接続情報をコードに直書きせず、 
+dotenv-java（io.github.cdimascio:java-dotenv）を使用して `.env` から安全に読み込んでいます。  
+
+ `.env` はプロジェクトのルートディレクトリに配置します。
+ 
+ `.env` の例  
+ 
+ ```Dotenv
+MYSQL_HOST=localhost
+MYSQL_PORT=3307
+MYSQL_DATABASE=kakeibo
+MYSQL_USER=appuser
+MYSQL_PASSWORD=apppass
+```
+JavaFX プロジェクトのため、外部ライブラリ（jar）は  `lib/` 配下に配置し、Eclipse のビルドパスに追加して使用しています。  
+
+
 MySQL 接続情報   
+このアプリでは、データベース接続情報を.envファイルで安全に管理しています。以下は開発用のデフォルト値です。  
 | 項目           | 値         |
 |----------------|------------|
 | ホスト         | localhost  |
@@ -109,8 +131,8 @@ CREATE TABLE transactions (
 ※ ユーザごとに家計簿データを管理する想定です。
 
 ## 4. アプリの起動方法（Eclipse）
-### ① MySQL Connector/J をビルドパスに追加
-`lib/mysql-connector-j-9.5.0.jar` をビルド・パスに追加（Classpath）
+### ① MySQL Connector/J  と dotenv-java をビルドパスに追加
+`lib/mysql-connector-j-9.5.0.jar` と `lib/java-dotenv-5.2.2.jar` をビルド・パスに追加（Classpath）
 
 設定手順：
 【プロジェクトのプロパティ】→【Java ビルド・パス】→【ライブラリ】→【外部 JAR の追加】
@@ -156,7 +178,7 @@ Main.java → 右クリック → 【実行】 → 【実行の構成】→ 【�
 4. 登録したユーザー名とパスワードを入力し、「ログイン」ボタンを押します。  
 5. 家計簿管理画面に遷移します。
 
-## 6. アプリ構成図（Data Flow / ER 図）
+## 6. アプリ構成図（DFD / ERD / DAO）
 
 ### データフロー図（DFD）
 アプリ全体のデータの流れは以下の通りです。  
@@ -174,7 +196,7 @@ Main.java → 右クリック → 【実行】 → 【実行の構成】→ 【�
 
 
  
- ### DAO構造図（DAO Architecture Diagram）
+### DAO構造図（DAO Architecture Diagram）
 
 ユーザー情報と家計簿データを扱う DAO クラスの責務を示しています。
 
