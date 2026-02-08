@@ -5,6 +5,12 @@
 データベースは Docker 上の MySQL を使用しており、ローカル環境でも簡単にセットアップできます。
 ---
 
+## 主な機能
+- ユーザー登録 / ログイン
+- 収支の登録（カテゴリ・日付・金額・メモ）
+- 収支一覧の表示
+- ユーザーごとのデータ管理  
+
 ## 使用技術
 
 * Java 21
@@ -50,22 +56,44 @@ docker start kakeibo-mysql
 docker compose down
 ```
 
-環境変数管理（dotenv-java）
+## 2.1 Docker 用 .env の設定
+
+Docker Compose はプロジェクト直下の `.env` を自動読み込みします。
+パスワードなどの機密情報は docker-compose.yml に直書きせず、
+`.env` に記述してください。
+
+例:
+
+```env
+MYSQL_ROOT_PASSWORD=rootpass
+MYSQL_DATABASE=kakeibo
+MYSQL_USER=appuser
+MYSQL_PASSWORD=apppass
+```
+⚠ この `.env` は Docker 用です。
+Javaアプリ側の `.env`（DB_URL / DB_USER / DB_PASSWORD）とは別物です。  
+
+## 環境変数管理（dotenv-java）
 このアプリでは、データベース接続情報をコードに直書きせず、 
-dotenv-java（io.github.cdimascio:java-dotenv）を使用して `.env` から安全に読み込んでいます。  
+dotenv-java を使用して `.env` から安全に読み込んでいます。  
 
  `.env` はプロジェクトのルートディレクトリに配置します。
  
  `.env` の例  
  
  ```Dotenv
-MYSQL_HOST=localhost
-MYSQL_PORT=3307
-MYSQL_DATABASE=kakeibo
-MYSQL_USER=appuser
-MYSQL_PASSWORD=apppass
+DB_URL=jdbc:mysql://localhost:3307/kakeibo?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo
+DB_USER=appuser
+DB_PASSWORD=apppass
 ```
 JavaFX プロジェクトのため、外部ライブラリ（jar）は  `lib/` 配下に配置し、Eclipse のビルドパスに追加して使用しています。  
+
+⚠ dotenv-java の注意点
+
+* `.env` はプロジェクト直下に配置する
+* Windows の環境変数に同名キーがあると、`.env` より OS の値が優先される  
+  → `.env` が反映されない場合は、環境変数に `DB_URL` / `DB_USER` / `DB_PASSWORD` がないか確認
+* `.env` は UTF-8（BOMなし）で保存する
 
 
 MySQL 接続情報   
@@ -228,6 +256,7 @@ Main.java → 右クリック → 【実行】 → 【実行の構成】→ 【�
 | Application を解決できません | JavaFX がコンパイル時に見えていない | Classpath ではなく Modulepath を使用する |
 | Unsupported JavaFX configuration: classes were loaded from 'unnamed module' | JavaFX が classpath で読み込まれている | module-path を正しく設定する |
 | InvalidPathException: Illegal char <:> | `/C:\...` のように不正なパス形式 | `C:\...` の Windows パスに修正 |  
+| `.env`の内容が反映されない | OS の環境変数が優先されている | Windows の環境変数から同名のキーを削除する |  
 
 
 ## 今後の課題  

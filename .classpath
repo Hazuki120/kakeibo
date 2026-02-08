@@ -8,6 +8,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX21"/>
 	<classpathentry kind="lib" path="C:/pleiades/2025-12/workspace6/kakeibo/lib/mysql-connector-j-9.5.0/mysql-connector-j-9.5.0.jar"/>
-	<classpathentry kind="lib" path="C:/pleiades/2025-12/workspace6/kakeibo/lib/java-dotenv-5.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/pleiades/2025-12/workspace6/kakeibo/lib/dotenv-java-2.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
