@@ -42,7 +42,7 @@ Java 11 以降、JavaFX は JDK に同梱されていません。
 
 ## アプリ全体構成
 
-<img src="./screenshots/dfd.png"width="700">
+<img src="./screenshots/dfd.png" width="700">
 
 JavaFX アプリから DAO を介して MySQL(Docker)へアクセスする構成です。  
 DB 初期化は SQL スクリプトで自動実行されます。
