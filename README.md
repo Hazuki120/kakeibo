@@ -6,10 +6,12 @@
 ---
 
 ## 主な機能
-- ユーザー登録 / ログイン
-- 収支の登録（カテゴリ・日付・金額・メモ）
-- 収支一覧の表示
-- ユーザーごとのデータ管理  
+- ユーザー登録・ログイン認証
+- 収支データの追加・削除
+- 日付・カテゴリ・金額・メモの入力
+- 合計金額の自動計算
+- ローカル環境で完結するデスクトップアプリ
+---
 
 ## 使用技術
 
@@ -35,6 +37,65 @@
 ⚠ **注意**  
 Java 11 以降、JavaFX は JDK に同梱されていません。  
 本プロジェクトでは JavaFX を module-path 方式で使用します。
+
+---
+
+## アプリ全体構成
+
+<img src="./screenshots/dfd.png"
+width="700"
+style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; background: #fff;"
+>
+
+JavaFX アプリから DAO を介して MySQL(Docker)へアクセスする構成です。  
+DB 初期化は SQL スクリプトで自動実行されます。
+
+---
+
+### ER 図
+
+<img src="./screenshots/erd.png" width="600"
+style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; background: #fff;"
+>
+
+ユーザと収支データは **1 対 多** の関係です。
+
+---
+ 
+### DAO構造図
+
+<img src="./screenshots/relationship.png" width="600"
+style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; background: #fff;"
+>
+
+- `UsersDAO`：ログイン認証、ユーザー登録、存在確認  
+- `TransactionDAO`：収支データの取得・追加・削除 
+
+
+ 
+## 画面キャプチャ
+
+### ログイン画面
+
+<img src="./screenshots/login.png" width="450"
+style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; background: #fff;"
+>
+
+ユーザー名とパスワードを入力してログインします。
+
+
+---
+
+### 家計簿画面
+
+<img src="./screenshots/input.png" width="700"
+style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; background: #fff;"
+>
+
+日付・カテゴリ・金額・メモを入力して登録できます。
+収支データの一覧表示、追加、削除ができます。
+
+---
 
 ## 1. リポジトリをクローン
 ```bash
@@ -106,7 +167,7 @@ MySQL 接続情報
 | パスワード     | apppass    |
 | データベース名 | kakeibo    |
 
-※ 開発用のパスワードです。
+※ 開発用のパスワードです。  
 ※ `docker compose` で作成したコンテナは `docker start kakeibo-mysql` でも再起動可能です。
 
 ## 3. データベース構造
@@ -205,45 +266,6 @@ Main.java → 右クリック → 【実行】 → 【実行の構成】→ 【�
 3. 「戻る」ボタンでログイン画面に戻ります。  
 4. 登録したユーザー名とパスワードを入力し、「ログイン」ボタンを押します。  
 5. 家計簿管理画面に遷移します。
-
-## 6. アプリ構成図（DFD / ERD / DAO）
-
-### データフロー図（DFD）
-アプリ全体のデータの流れは以下の通りです。  
-
-![dfd](./screenshots/dfd.png)
-
----
-
-
-### ER 図（ERD）
-ユーザと家計簿データの関係を示した ER 図です。  
-![erd](./screenshots/erd.png)
-
----
-
-
- 
-### DAO構造図（DAO Architecture Diagram）
-
-ユーザー情報と家計簿データを扱う DAO クラスの責務を示しています。
-
-![relationship](./screenshots/relationship.png)
-
- 
- ## 7. 画面キャプチャ
-
-### 🔐 ログイン画面
-ユーザー名とパスワードを入力してログインします。
-
-![login](./screenshots/login.png)
-
----
-
-### 📝 家計簿入力画面（収支登録）
-日付・カテゴリ・金額・メモを入力して登録できます。
-
-![input](./screenshots/input.png)
 
 ---
 
