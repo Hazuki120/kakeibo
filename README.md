@@ -42,7 +42,7 @@ Java 11 以降、JavaFX は JDK に同梱されていません。
 
 ## アプリ全体構成
 
-<img src="./screenshots/dfd.png"width="700"style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; background: #fff;">
+<img src="./screenshots/dfd.png"width="700">
 
 JavaFX アプリから DAO を介して MySQL(Docker)へアクセスする構成です。  
 DB 初期化は SQL スクリプトで自動実行されます。
@@ -51,7 +51,7 @@ DB 初期化は SQL スクリプトで自動実行されます。
 
 ### ER 図
 
-<img src="./screenshots/erd.png" width="600"style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; background: #fff;">
+<img src="./screenshots/erd.png" width="600">
 
 ユーザと収支データは **1 対 多** の関係です。
 
@@ -59,7 +59,7 @@ DB 初期化は SQL スクリプトで自動実行されます。
  
 ### DAO構造図
 
-<img src="./screenshots/relationship.png" width="600"style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);padding: 8px; background: #fff;">
+<img src="./screenshots/relationship.png" width="600">
 
 - `UsersDAO`：ログイン認証、ユーザー登録、存在確認  
 - `TransactionDAO`：収支データの取得・追加・削除 
@@ -70,7 +70,7 @@ DB 初期化は SQL スクリプトで自動実行されます。
 
 ### ログイン画面
 
-<img src="./screenshots/login.png" width="450"style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px;background: #fff;">
+<img src="./screenshots/login.png" width="450">
 
 ユーザー名とパスワードを入力してログインします。
 
@@ -79,7 +79,7 @@ DB 初期化は SQL スクリプトで自動実行されます。
 
 ### 家計簿画面
 
-<img src="./screenshots/input.png" width="700" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; background: #fff;">
+<img src="./screenshots/input.png" width="700">
 
 日付・カテゴリ・金額・メモを入力して登録できます。
 収支データの一覧表示、追加、削除ができます。
