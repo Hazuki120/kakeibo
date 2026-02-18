@@ -1,11 +1,16 @@
 package app.view;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 import app.controller.BudgetController;
 import app.model.MukkunTransaction;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -54,15 +59,15 @@ public class BudgetView {
 		TableColumn<MukkunTransaction, String> dateColumn = new TableColumn<>("日付");
 		dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 		dateColumn.setPrefWidth(120);
-		
+
 		TableColumn<MukkunTransaction, String> categoryColumn = new TableColumn<>("カテゴリ");
 		categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
 		categoryColumn.setPrefWidth(100);
-		
+
 		TableColumn<MukkunTransaction, Integer> amountColumn = new TableColumn<>("金額");
 		amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 		amountColumn.setPrefWidth(80);
-		
+
 		// 金額の色付け（収入→青、支出→赤）
 		amountColumn.setCellFactory(col -> new TableCell<>() {
 			@Override
@@ -81,15 +86,15 @@ public class BudgetView {
 				}
 			}
 		});
-		
+
 		TableColumn<MukkunTransaction, String> memoColumn = new TableColumn<>("メモ");
 		memoColumn.setCellValueFactory(new PropertyValueFactory<>("memo"));
 		memoColumn.setPrefWidth(250);
-		
+
 		// 列を TableView に追加
 		table.getColumns().addAll(dateColumn, categoryColumn, amountColumn, memoColumn);
 
-		// データをTableにセット
+		// データをTableにセット(いらない？）
 		table.setItems(data);
 
 		// 合計ラベル
@@ -105,10 +110,10 @@ public class BudgetView {
 		categoryBox.getItems().addAll(
 				"給料", "食費", "日用品", "娯楽", "交通費", "通信費", "光熱費", "家賃", "保険", "ローン", "投資", "せんちゃ", "その他");
 		categoryBox.setPromptText("カテゴリ選択");
-		
+
 		TextField amountField = new TextField();
 		amountField.setPromptText("金額");
-		
+
 		TextField memoField = new TextField();
 		memoField.setPromptText("メモ");
 
@@ -116,13 +121,13 @@ public class BudgetView {
 		RadioButton expenseRadio = new RadioButton("支出");
 		RadioButton incomeRadio = new RadioButton("収入");
 		ToggleGroup typeGroup = new ToggleGroup();
-		
+
 		expenseRadio.setToggleGroup(typeGroup);
 		incomeRadio.setToggleGroup(typeGroup);
 
 		// 初期値を支出
 		expenseRadio.setSelected(true);
-		
+
 		HBox typeBox = new HBox(10, expenseRadio, incomeRadio);
 
 		// ボタン
@@ -153,7 +158,7 @@ public class BudgetView {
 
 				// ①DBに保存
 				controller.addTransaction(userId, t);
-				
+
 				// ②TableView に追加
 				data.add(t);
 
@@ -165,7 +170,7 @@ public class BudgetView {
 				categoryBox.setValue(null);
 				memoField.clear();
 				amountField.clear();
-				
+
 			} catch (NumberFormatException ex) {
 				Alert alert = new Alert(Alert.AlertType.ERROR, "金額は数字で入力してください！");
 				alert.showAndWait();
@@ -174,32 +179,88 @@ public class BudgetView {
 
 		// 削除ボタンの処理 
 		deleteButton.setOnAction(e -> {
-            MukkunTransaction selected = table.getSelectionModel().getSelectedItem();
-            if (selected == null) {
-                new Alert(Alert.AlertType.ERROR, "削除する項目を選択してください。").showAndWait();
-                return;
-            }
+			MukkunTransaction selectedItem = table.getSelectionModel().getSelectedItem();
+			if (selectedItem == null) {
+				new Alert(Alert.AlertType.ERROR, "削除する項目を選択してください。").showAndWait();
+				return;
+			}
 
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "本当に削除しますか？");
-            confirm.showAndWait().ifPresent(result -> {
-                if (result == ButtonType.OK) {
-                    controller.deleteTransaction(selected.getId());
-                    data.remove(selected);
-                    updateTotal();
-                }
-            });
-        });
+			Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "本当に削除しますか？");
+			confirm.showAndWait().ifPresent(result -> {
+				if (result == ButtonType.OK) {
+					controller.deleteTransaction(selectedItem.getId());
+					data.remove(selectedItem);
+					updateTotal();
+				}
+			});
+		});
+		
+		
+		// 年月の ComboBox を作る
+		ComboBox<Integer> yearCombo = new ComboBox<>();
+		for(int y = 2020; y <= 2030; y++) {
+			yearCombo.getItems().add(y);
+		}
+		yearCombo.setPromptText("年");
+		
+		ComboBox<String> monthCombo = new ComboBox<>();
+		monthCombo.getItems().addAll("1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月");
+		monthCombo.setPromptText("月");
+		
+
+		// グラフ表示ボタン
+		Button graphButton = new Button("月別カテゴリグラフ");
+
+		// 月別グラフ表示ボタンの処理
+		graphButton.setOnAction(e -> {
+			Integer selectedYear = yearCombo.getValue();
+			String monthStr = monthCombo.getValue();
+			
+			if (selectedYear == null || monthStr == null) {
+				new Alert(Alert.AlertType.ERROR, "年と月を選択してください。").showAndWait();
+				return;
+			}
+			
+			int month = Integer.parseInt(monthStr.replace("月", ""));
+			YearMonth ym = YearMonth.of(selectedYear, month);
+			String yearMonth = ym.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+
+			Map<String, Integer> totals = controller.calculateMonthlyCategoryTotals(data, yearMonth);
+			
+			int monthlyTotal = controller.calculateMonthlyTotal(data, yearMonth);
+
+			PieChart pieChart = new PieChart();
+			for (Map.Entry<String, Integer> entry : totals.entrySet()) {
+				int value = entry.getValue();
+				// 支出だけをグラフ化したい場合は amount < 0 のみ
+				if (value < 0) {
+					pieChart.getData().add(
+							new PieChart.Data(entry.getKey(), Math.abs(value)));
+				}
+			}
+			
+			Label totalLabel = new Label("月合計:" + monthlyTotal + "円");
+
+			VBox box = new VBox(10, pieChart, totalLabel);
+			Stage chartStage = new Stage();
+			chartStage.setTitle(yearMonth + "カテゴリ別支出グラフ");
+			chartStage.setScene(new Scene(box, 400, 300));
+			chartStage.show();
+		});
 
 		// レイアウト
 		HBox inputBox = new HBox(10, datePicker, categoryBox, typeBox, amountField, memoField, addButton);
 		HBox.setHgrow(memoField, Priority.ALWAYS);
+		// ↓いらない？
 		memoField.setMaxWidth(Double.MAX_VALUE);
 
 		// 画面レイアウト
-		VBox root = new VBox(10, table, inputBox, deleteButton, totalLabel);
-		
+		HBox ymBox = new HBox(10, yearCombo, monthCombo, graphButton);
+		ymBox.setAlignment(Pos.CENTER_RIGHT);
+		VBox root = new VBox(10, table, inputBox, ymBox, deleteButton, totalLabel);
+
 		// 画面の大きさ
-		return new Scene(root, 750, 500);
+		return new Scene(root, 800, 500);
 
 	}
 

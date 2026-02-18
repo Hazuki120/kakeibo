@@ -1,5 +1,8 @@
 package app.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import app.dao.TransactionDAO;
 import app.model.MukkunTransaction;
 import javafx.collections.ObservableList;
@@ -59,6 +62,40 @@ public class BudgetController {
 				.filter(t -> t.getDate().startsWith(yearMonth))
 				.mapToInt(MukkunTransaction::getAmount)
 				.sum();
+	}
+	/**
+	 * カテゴリ別のグラフを表示する
+	 * 
+	 * @param list TableViewに表示されているデータ
+	 * @return カテゴリ別合計金額
+	 */
+	public Map<String, Integer>calculateCategoryTotals(ObservableList<MukkunTransaction> list){
+		Map<String, Integer>totals = new HashMap<>();
+		
+		for(MukkunTransaction t : list) {
+			String category = t.getCategory();
+			int amount = t.getAmount();
+			
+			totals.put(category, totals.getOrDefault(category, 0) + amount);
+		}
+		
+		return totals;
+	}
+	
+	public Map<String, Integer>calculateMonthlyCategoryTotals(
+			ObservableList<MukkunTransaction> list,
+			String yearMonth){
+		Map<String, Integer> totals = new HashMap<>();
+		
+		for(MukkunTransaction t : list) {
+			if(t.getDate().startsWith(yearMonth)) {
+				String category = t.getCategory();
+				int amount = t.getAmount();
+				totals.put(category, totals.getOrDefault(category, 0) + amount);
+			}
+		}
+		
+		return totals;
 	}
 
 }
